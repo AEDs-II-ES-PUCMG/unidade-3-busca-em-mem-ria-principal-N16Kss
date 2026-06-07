@@ -110,25 +110,35 @@ public class App {
     }
     
     static <K> Produto localizarProduto(ABB<K, Produto> produtosCadastrados, K procurado) {
-    	
-    	// TODO
-    	return null;
+        if(produtosCadastrados.pesquisar(procurado)!=null){
+        return produtosCadastrados.pesquisar(procurado);
+        }else{
+            return null;
+        }
     }
     
     /** Localiza um produto na árvore de produtos organizados por id, a partir do código de produto informado pelo usuário, e o retorna. 
      *  Em caso de não encontrar o produto, retorna null */
     static Produto localizarProdutoID(ABB<Integer, Produto> produtosCadastrados) {
-        
-        //TODO
-    	return null;
+       
+        Integer IDesejado = teclado.nextInt();
+        if(produtosCadastrados.pesquisar(IDesejado)!=null){
+                return produtosCadastrados.pesquisar(IDesejado);
+        }else{
+            return null;
+        }
     }
     
     /** Localiza um produto na árvore de produtos organizados por nome, a partir do nome de produto informado pelo usuário, e o retorna. 
      *  A busca não é sensível ao caso. Em caso de não encontrar o produto, retorna null */
     static Produto localizarProdutoNome(ABB<String, Produto> produtosCadastrados) {
         
-    	//TODO
+    	String nomeDesejado = teclado.nextLine();
+        if(produtosCadastrados.pesquisar(nomeDesejado)!= null){
+            return produtosCadastrados.pesquisar(nomeDesejado);
+        }else{
     	return null;
+        }
     }
     
     private static void mostrarProduto(Produto produto) {

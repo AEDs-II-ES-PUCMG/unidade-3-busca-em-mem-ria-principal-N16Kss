@@ -136,19 +136,98 @@ public class ABB<K, V> implements IMapeamento<K, V>{
      */
     public int inserir(K chave, V item) {
     	// TODO
+
+		this.raiz = inserir(this.raiz, chave, item);
+        tamanho++;
     	return tamanho;
     }
+
+
+
+protected No<K, V> inserir(No<K, V> raizArvore, K chave, V item) {
+    	
+    	int comparacao;
+    	
+        /// Se a raiz da árvore ou sub-árvore for null, a árvore/sub-árvore está vazia e então um novo item é inserido.
+        if (raizArvore == null)
+            raizArvore = new No<>(chave, item);
+        else {
+        	comparacao = comparador.compare(chave, raizArvore.getChave());
+        
+        	if (comparacao < 0)
+        		/// Se a chave do item que deverá ser inserido na árvore for menor do que 
+        		/// a chave do item armazenado na raiz da árvore:
+        		/// adicione esse novo item à sub-árvore esquerda; 
+        		/// e atualize a referência para a sub-árvore esquerda modificada. 
+        		raizArvore.setEsquerda(inserir(raizArvore.getEsquerda(), chave, item));
+        	else if (comparacao > 0)
+        		/// Se a chave do item que deverá ser inserido na árvore for maior do que 
+        		/// a chave do item armazenado na raiz da árvore:
+        		/// adicione esse novo item à sub-árvore direita; 
+        		/// e atualize a referência para a sub-árvore direita modificada.
+        		raizArvore.setDireita(inserir(raizArvore.getDireita(), chave, item));
+        	else
+        		/// A chave do item armazenado na raiz da árvore 
+        		/// é igual à chave do novo item que deveria ser inserido na árvore.
+        		throw new IllegalArgumentException("O item já foi inserido anteriormente na árvore.");
+        }
+        
+        /// Retorna a raiz atualizada da árvore ou sub-árvore em que o item foi adicionado.
+        return raizArvore;
+    }
+
+
+
+
+
+
+
+
+
+	@Override
+	public String percorrer() {
+		return caminhamentoEmOrdem();
+	}
+    
+    public String caminhamentoEmOrdem() {
+    	
+    	if (vazia())
+    		throw new IllegalStateException("A árvore está vazia!");
+    	
+    	return caminhamentoEmOrdem(raiz);
+    }
+    
+    private String caminhamentoEmOrdem(No<K, V> raizArvore) {
+    	if (raizArvore != null) {
+    		String resposta = caminhamentoEmOrdem(raizArvore.getEsquerda());
+    		resposta += raizArvore.getItem() + "\n";
+    		resposta += caminhamentoEmOrdem(raizArvore.getDireita());
+    		
+    		return resposta;
+    	} else {
+    		return "";
+    	}
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Override 
     public String toString(){
     	return percorrer();
     }
 
-    @Override
-    public String percorrer() {
-    	// TODO
-    	return null;
-    }
 
     @Override
     /**
@@ -163,10 +242,48 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 
     
     public Lista<V> recortar(K chaveDeOnde, K chaveAteOnde) {
-		
-    	// TODO
-		return null;
-	}
+    Lista<V> lista = new Lista<>();
+
+    recortar(raiz, chaveDeOnde, chaveAteOnde, lista);
+
+    return lista;
+}
+
+
+
+private void recortar(No<K,V> no,K chaveDeOnde,K chaveAteOnde, Lista<V> lista) {
+
+    if(no == null)
+        return;
+
+    recortar(no.getEsquerda(), chaveDeOnde, chaveAteOnde, lista);
+
+    if(comparador.compare(no.getChave(), chaveDeOnde) >= 0 &&
+       comparador.compare(no.getChave(), chaveAteOnde) <= 0) {
+
+        lista.inserir(no.getItem());
+    }
+
+    recortar(no.getDireita(), chaveDeOnde, chaveAteOnde, lista);
+}
+
+
+
+
+
+
+
+public V getItemRaiz() {
+    if(raiz == null)
+        return null;
+
+    return raiz.getItem();
+}
+
+
+
+
+
 
 	@Override
 	public int tamanho() {
