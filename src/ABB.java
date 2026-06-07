@@ -346,6 +346,8 @@ private void recortar(No<K,V> no,K chaveDeOnde,K chaveAteOnde, Lista<V> lista) {
     }
 
     recortar(no.getDireita(), chaveDeOnde, chaveAteOnde, lista);
+
+	lista.toString();
 }
 
 
