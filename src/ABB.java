@@ -236,9 +236,90 @@ protected No<K, V> inserir(No<K, V> raizArvore, K chave, V item) {
      * @return o valor associado ao item removido.
      */
     public V remover(K chave) {
-    	// TODO
-    	return null;
+
+    	V removido = pesquisar(chave);
+		raiz = remover(raiz, chave);
+		tamanho--;
+		return removido;
     }
+
+
+	protected No<K, V> remover(No<K, V> raizArvore, K chaveRemover) {
+    	
+    	int comparacao;
+    	
+        /// Se a raiz da árvore ou sub-árvore for null, a árvore está vazia e o item, que deveria ser retirado dessa árvore, não foi encontrado.
+        /// Nesse caso, deve-se lançar uma exceção.
+        if (raizArvore == null) 
+        	throw new NoSuchElementException("O item a ser removido não foi localizado na árvore!");
+        
+        comparacao = comparador.compare(chaveRemover, raizArvore.getChave());
+        
+        if (comparacao == 0) {
+            /// O item armazenado na raiz da árvore corresponde ao item que deve ser retirado dessa árvore.
+            /// Ou seja, o item que deve ser retirado da árvore foi encontrado.
+        	if (raizArvore.getDireita() == null) {
+        		/// O nó da árvore que será retirado não possui descendentes à direita.
+                /// Nesse caso, os descendentes à esquerda do nó que está sendo retirado da árvore passarão a ser descendentes do nó-pai do nó que está sendo retirado.
+                raizArvore = raizArvore.getEsquerda();
+        	} else if (raizArvore.getEsquerda() == null) {
+                /// O nó da árvore que será retirado não possui descendentes à esquerda.
+                /// Nesse caso, os descendentes à direita do nó que está sendo retirado da árvore passarão a ser descendentes do nó-pai do nó que está sendo retirado.
+                raizArvore = raizArvore.getDireita();
+        	} else {
+            	/// O nó que está sendo retirado da árvore possui descendentes à esquerda e à direita.
+                /// Nesse caso, o antecessor do nó que está sendo retirado é localizado na sub-árvore esquerda desse nó. 
+                /// O antecessor do nó que está sendo retirado da árvore corresponde
+                /// ao nó que armazena o item cuja chave é a maior, 
+                /// dentre as chaves menores do que a do item do nó que está sendo retirado.
+                /// Depois de ser localizado na sub-árvore esquerda do nó que está sendo retirado, 
+                /// o antecessor desse nó o substitui.
+                /// A sub-árvore esquerda do nó que foi retirado é atualizada com a remoção do antecessor.
+                raizArvore.setEsquerda(removerNoAntecessor(raizArvore, raizArvore.getEsquerda()));
+        	}
+        } else if (comparacao < 0)
+        	/// Se a chave do item que deverá ser localizado e retirado da árvore 
+        	/// for menor do que a chave do item armazenado na raiz da árvore:
+        	/// pesquise e retire esse item da sub-árvore esquerda.
+            raizArvore.setEsquerda(remover(raizArvore.getEsquerda(), chaveRemover));
+        else
+        	/// Se a chave do item que deverá ser localizado e retirado da árvore
+        	/// for maior do que a chave do item armazenado na raiz da árvore:
+        	/// pesquise e retire esse item da sub-árvore direita.
+            raizArvore.setDireita(remover(raizArvore.getDireita(), chaveRemover));
+         
+        /// Retorna a raiz atualizada da árvore ou sub-árvore da qual o item foi retirado.
+        return raizArvore;
+    }
+
+
+
+	protected No<K, V> removerNoAntecessor(No<K, V> itemRetirar, No<K, V> raizArvore) {
+        /// Se o antecessor do nó que deverá ser retirado da árvore ainda não foi encontrado...
+        if (raizArvore.getDireita() != null) {
+            /// Pesquise o antecessor na sub-árvore direita.
+            raizArvore.setDireita(removerNoAntecessor(itemRetirar, raizArvore.getDireita()));
+        } else {
+        	/// O antecessor do nó que deverá ser retirado da árvore foi encontrado e deverá substitui-lo.
+        	itemRetirar.setChave(raizArvore.getChave());
+            itemRetirar.setItem(raizArvore.getItem());
+            /// A raiz da árvore ou sub-árvore é atualizada com os descendentes à esquerda do antecessor.
+            /// Ou seja, retira-se o antecessor da árvore.
+            raizArvore = raizArvore.getEsquerda();
+        }
+        return raizArvore;
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     
     public Lista<V> recortar(K chaveDeOnde, K chaveAteOnde) {

@@ -164,8 +164,9 @@ public class App {
     /** Localiza e remove um produto da árvore de produtos organizados por id, a partir do código de produto informado pelo usuário, e o retorna. 
      *  Em caso de não encontrar o produto, retorna null */
     static Produto removerProdutoId(ABB<Integer, Produto> produtosCadastrados) {
-    	//TODO
-    	return null;
+    	Integer IDesejado = teclado.nextInt();
+        return produtosCadastrados.remover(IDesejado);
+    	
     }
 
      /** Localiza e remove um produto na árvore de produtos organizados por nome, a partir do nome de produto informado pelo usuário, e o retorna. 
