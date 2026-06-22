@@ -79,7 +79,12 @@ public class App {
         System.out.println("3 - Pedidos de um produto, em arquivo");
         System.out.println("0 - Sair");
         System.out.print("Digite sua opção: ");
-        return Integer.parseInt(teclado.nextLine());
+        
+
+
+
+        Integer opcao = lerOpcao("Digite sua opção: ", Integer.class);
+        return opcao != null ? opcao : -1;
     }
 
     /**
@@ -134,7 +139,13 @@ public class App {
     static Produto localizarProdutoID() {
         cabecalho();
         System.out.println("LOCALIZANDO POR ID");
-        int ID = lerOpcao("Digite o ID para busca", Integer.class);
+        Integer ID = lerOpcao("Digite o ID para busca", Integer.class);
+
+        if (ID == null) {
+            System.out.println("ID inválido fornecido. A busca foi cancelada.");
+            return null;
+        }
+
         Produto localizado = localizarProduto(produtosPorId, ID);
         mostrarProduto(localizado);
         return localizado;
@@ -165,22 +176,55 @@ public class App {
         Lista<Pedido> pedidos = new Lista<>();
         Random sorteio = new Random(42);
         int quantProdutos;
+
         for (int i = 0; i < quantidade; i++) {
             Pedido ped = new Pedido();
             quantProdutos = sorteio.nextInt(8) + 1;
+
+        
+
             for (int j = 0; j < quantProdutos; j++) {
                 int id = sorteio.nextInt(7750) + 10_000;
+                try{
                 Produto prod = produtosPorId.pesquisar(id);
-                ped.incluirProduto(prod);
-                inserirNaTabela(prod, ped);
-            }
+                if(prod != null){
+                    ped.incluirProduto(prod);
+                    inserirNaTabela(prod, ped);
+                }}catch(NoSuchElementException e) {
+                    // Ignora silenciosamente se o ID gerado aleatoriamente não existir
+                }
+            }  
             pedidos.inserir(ped);
+            }
+            return pedidos;
         }
-        return pedidos;
-    }
+        
+        
+        
+    
 
     private static void inserirNaTabela(Produto produto, Pedido pedido) {
-        // TODO
+
+
+       try {
+
+        // Produto já possui lista de pedidos
+        Lista<Pedido> listaPedidos = pedidosPorProduto.pesquisar(produto);
+
+        listaPedidos.inserir(pedido);
+
+    } catch (NoSuchElementException e) {
+
+        // Primeiro pedido desse produto
+        Lista<Pedido> listaPedidos = new Lista<>();
+        listaPedidos.inserir(pedido);
+
+        pedidosPorProduto.inserir(produto, listaPedidos);
+    }
+
+
+
+
     }
 
     private static void recortarArvore(ABB<String, Produto> arvore) {
@@ -194,7 +238,7 @@ public class App {
         System.out.println(arvore.recortar(descIni, descFim));
     }
 
-    static void pedidosDoProduto(){
+    /* static void pedidosDoProduto(){
         Produto produto = localizarProdutoID();
         String nomeArquivo = "RelatorioProduto"+produto.hashCode()+".txt";    
         try (FileWriter arquivoRelatorio = new FileWriter(nomeArquivo)){
@@ -205,12 +249,70 @@ public class App {
         } catch (IOException e) {
             System.out.println("Problemas para criar o arquivo "+nomeArquivo+". Tente novamente");
         }
+    }*/
+
+    static void pedidosDoProduto() {
+
+    Produto produto = localizarProdutoID();
+
+    if (produto == null) {
+        System.out.println("Produto não encontrado.");
+        return;
     }
+
+    try {
+
+        Lista<Pedido> pedidos = pedidosPorProduto.pesquisar(produto);
+
+        String nomeArquivo =
+                "RelatorioProduto_" +
+                produto.hashCode() +
+                ".txt";
+
+        FileWriter arquivo = new FileWriter(nomeArquivo);
+
+        arquivo.write("RELATÓRIO DE PEDIDOS\n");
+        arquivo.write("====================\n\n");
+
+        arquivo.write("Produto:\n");
+        arquivo.write(produto.toString() + "\n\n");
+
+        arquivo.write("Pedidos contendo o produto:\n\n");
+
+        arquivo.write(pedidos.toString());
+
+        arquivo.close();
+
+        System.out.println("Relatório gerado em:");
+        System.out.println(nomeArquivo);
+
+    } catch (NoSuchElementException e) {
+
+        System.out.println(
+            "Não existem pedidos cadastrados para esse produto."
+        );
+
+    } catch (IOException e) {
+
+        System.out.println(
+            "Erro ao criar o arquivo de relatório."
+        );
+    }
+}
 
     public static void main(String[] args) {
         teclado = new Scanner(System.in, Charset.forName("UTF-8"));
         nomeArquivoDados = "produtos.txt";
         produtosPorId = lerProdutos(nomeArquivoDados, Produto::hashCode);
+
+        if (produtosPorId == null || produtosPorId.tamanho() == 0) {
+            System.out.println("Erro Arquivo de dados '"+ nomeArquivoDados +"' não encontrado ou vazio.");
+            System.out.println("O sistema será encerrado.");
+            teclado.close();
+            return; 
+        }
+
+
         produtosPorNome = new AVL<>(produtosPorId, prod -> prod.descricao, String::compareTo);
         pedidosPorProduto = new TabelaHash<>((int) (quantosProdutos * 1.25));
         gerarPedidos(25000);

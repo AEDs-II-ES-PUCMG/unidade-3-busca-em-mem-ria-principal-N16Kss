@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 public class ABB<K, V> implements IMapeamento<K, V>{
 
-	private No<K, V> raiz; // referência à raiz da árvore.
+	private No<K,V> raiz; // referência à raiz da árvore.
 	private Comparator<K> comparador; //comparador empregado para definir "menores" e "maiores".
 	private int tamanho;
 
