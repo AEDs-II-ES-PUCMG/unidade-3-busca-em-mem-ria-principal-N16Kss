@@ -299,5 +299,63 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 	@Override
 	public double getTempo() {
 		return tempo;
-	}
+    }
 }
+
+/*
+
+private void copiarParaHash(No<K,V> no) {
+
+    if(no != null) {
+
+        copiarParaHash(no.getEsquerda());
+
+        tabelaHash.inserir(
+            no.getChave(),
+            no.getItem()
+        );
+
+        copiarParaHash(no.getDireita());
+    }
+}
+
+/*
+
+private void copiarProdutos(No<Integer,Produto> no) {
+
+    if(no != null) {
+
+        copiarProdutos(no.getEsquerda());
+
+        pedidosPorProduto.inserir(
+            no.getItem(),
+            new Lista<Pedido>()
+        );
+
+        copiarProdutos(no.getDireita());
+    }
+}
+
+
+
+
+*/
+
+
+
+
+/*public boolean contem(K chave) {
+
+    try {
+        pesquisar(chave);
+        return true;
+    }
+    catch (NoSuchElementException e) {
+        return false;
+    }
+} */
+
+
+    /*if (!pedidosPorProduto.contem(produto)) {
+    pedidosPorProduto.inserir(produto, new Lista<Pedido>());
+} */
